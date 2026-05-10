@@ -69,7 +69,7 @@
   .number-display.revealed .num-text{filter:none;transition:filter .3s}
   .number-display.shake{animation:shake .4s ease;border-color:var(--red)}
   .number-display.correct-flash{animation:flash-green .5s ease}
-  .reveal-hint{font-size:11px;color:var(--text3);position:absolute;bottom:8px;left:0;right:0;text-align:center;direction:rtl;transition:color .3s;white-space:nowrap;padding:0 8px}
+  .reveal-hint{font-size:11px;color:var(--text3);position:absolute;bottom:8px;left:0;right:0;text-align:center;direction:rtl;transition:color .3s;white-space:nowrap;padding:0 8px;letter-spacing:normal;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
   .number-display.revealed .reveal-hint{display:none}
 
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
@@ -114,17 +114,25 @@
   /* iOS TTS unlock overlay */
   .tts-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
   .tts-overlay.show{display:flex}
-  .tts-box{background:var(--surface);border-radius:16px;padding:2rem;max-width:300px;text-align:center;direction:rtl}
-  .tts-box p{color:var(--text);font-size:15px;margin-bottom:1.25rem;line-height:1.6}
+  .tts-box{background:var(--surface);border-radius:16px;padding:2rem;max-width:320px;width:90%;text-align:center;direction:rtl}
+  .tts-box p{color:var(--text);font-size:15px;margin-bottom:1rem;line-height:1.6}
+  .tts-box .voice-label{font-size:13px;color:var(--text2);margin-bottom:6px;text-align:right}
+  .tts-box select{width:100%;margin-bottom:1rem;font-size:14px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);direction:rtl}
+  .tts-box .no-voice{font-size:13px;color:var(--red);margin-bottom:1rem;line-height:1.5;display:none}
   .tts-box button{width:100%;justify-content:center;padding:12px;font-size:15px}
 </style>
 </head>
 <body>
 
-<!-- iOS TTS unlock -->
+<!-- TTS unlock + voice select -->
 <div class="tts-overlay" id="tts-overlay">
   <div class="tts-box">
-    <p>اضغط للسماح بالصوت على هذا الجهاز</p>
+    <p>اختر الصوت وفعّل الصوت</p>
+    <div class="no-voice" id="no-voice-msg">
+      لا توجد أصوات عربية على هذا الجهاز. يرجى تثبيت اللغة العربية في إعدادات النظام ثم إعادة فتح الصفحة.
+    </div>
+    <div class="voice-label" id="voice-label">اختر الصوت العربي:</div>
+    <select id="voice-select-overlay" style="display:none"></select>
     <button class="btn-primary" onclick="unlockTTS()">
       <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
       تفعيل الصوت
@@ -203,7 +211,7 @@
 
   <div class="section">
     <div class="label">اكتب الرقم بالأرقام العادية:</div>
-    <input type="text" id="user-answer" placeholder="377899" inputmode="numeric" onkeydown="if(event.key==='Enter')checkAnswer()">
+    <input type="text" id="user-answer" placeholder="مثال: ٣٧٧٨٩٩" inputmode="numeric" onkeydown="if(event.key==='Enter')checkAnswer()">
     <div class="btn-row" style="margin-top:8px">
       <button class="btn-primary btn-full" onclick="checkAnswer()">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -287,11 +295,48 @@ let ttsUnlocked=false;
 let isDark=false;
 
 /* ── TTS: загрузка голосов ── */
+function getAllArabicVoices(){
+  return synth.getVoices().filter(v=>v.lang.startsWith('ar'));
+}
+
+function pickBestVoice(voices){
+  if(!voices.length)return null;
+  /* Приоритет: ar-SA → ar-EG → ar-AE → любой ar */
+  let preferred=['ar-SA','ar-EG','ar-AE','ar-KW','ar-BH'];
+  for(let lang of preferred){
+    let v=voices.find(v=>v.lang===lang);
+    if(v)return v;
+  }
+  return voices[0];
+}
+
+function populateVoiceSelect(voices){
+  let sel=document.getElementById('voice-select-overlay');
+  sel.innerHTML='';
+  voices.forEach((v,i)=>{
+    let opt=document.createElement('option');
+    opt.value=i;
+    opt.textContent=v.name+' ('+v.lang+')';
+    sel.appendChild(opt);
+  });
+  /* Пре-выбираем лучший голос */
+  let best=pickBestVoice(voices);
+  let bestIdx=voices.indexOf(best);
+  if(bestIdx>=0)sel.value=bestIdx;
+}
+
 function findArabicVoice(){
-  let voices=synth.getVoices();
-  let av=voices.filter(v=>v.lang.startsWith('ar'));
-  if(av.length>0){arabicVoice=av[0];return true;}
-  /* Fallback: любой голос если арабского нет */
+  let voices=getAllArabicVoices();
+  if(voices.length>0){
+    /* Обновляем список в оверлее */
+    populateVoiceSelect(voices);
+    document.getElementById('voice-select-overlay').style.display='block';
+    document.getElementById('voice-label').style.display='block';
+    document.getElementById('no-voice-msg').style.display='none';
+    /* Выбираем лучший если ещё не выбран пользователем */
+    if(!arabicVoice)arabicVoice=pickBestVoice(voices);
+    return true;
+  }
   return false;
 }
 
@@ -300,35 +345,42 @@ function initVoices(){
   if(synth.onvoiceschanged!==undefined){
     synth.onvoiceschanged=function(){findArabicVoice();};
   }
-  /* Android Chrome грузит голоса асинхронно — повторяем несколько раз */
   [100,500,1000,2000,3000].forEach(ms=>setTimeout(findArabicVoice,ms));
 }
 initVoices();
 
 /* ── iOS: разблокировка TTS через пользовательский жест ── */
 function checkIOSUnlock(){
-  let isMobile=/Android|iPad|iPhone|iPod/.test(navigator.userAgent);
-  if(isMobile&&!ttsUnlocked){
-    document.getElementById('tts-overlay').classList.add('show');
+  /* Показываем оверлей выбора голоса на всех устройствах */
+  if(!ttsUnlocked){
+    /* Даём время голосам загрузиться, потом показываем */
+    setTimeout(function(){
+      findArabicVoice();
+      document.getElementById('tts-overlay').classList.add('show');
+    },800);
   }
 }
 
 function unlockTTS(){
-  /* Разблокировка через реальный жест пользователя */
+  /* Берём голос выбранный пользователем из списка */
+  let voices=getAllArabicVoices();
+  if(voices.length>0){
+    let sel=document.getElementById('voice-select-overlay');
+    let idx=parseInt(sel.value)||0;
+    arabicVoice=voices[idx]||pickBestVoice(voices);
+  } else {
+    /* Нет арабских голосов — показываем инструкцию */
+    document.getElementById('no-voice-msg').style.display='block';
+    document.getElementById('voice-label').style.display='none';
+    document.getElementById('voice-select-overlay').style.display='none';
+    return;
+  }
   synth.cancel();
   let utt=new SpeechSynthesisUtterance(' ');
-  utt.volume=0;
-  utt.rate=1;
-  utt.onend=function(){
-    ttsUnlocked=true;
-    findArabicVoice();
-  };
+  utt.volume=0;utt.rate=1;
+  utt.onend=function(){ttsUnlocked=true;};
   synth.speak(utt);
-  /* Страховка если onend не сработает */
-  setTimeout(function(){
-    ttsUnlocked=true;
-    findArabicVoice();
-  },500);
+  setTimeout(function(){ttsUnlocked=true;},500);
   document.getElementById('tts-overlay').classList.remove('show');
 }
 
