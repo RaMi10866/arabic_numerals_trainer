@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="أعداد عربية">
+<meta name="apple-mobile-web-app-title" content="أرقام عربية">
 <meta name="theme-color" content="#a8c4fc">
-<title>تدريب الأعداد العربية</title>
+<title>تدريب الأرقام العربية</title>
 <style>
   :root{
     --bg-grad:linear-gradient(135deg,#a8c4fc 0%,#f5e6d0 50%,#f7b8e0 100%);
@@ -69,7 +69,7 @@
   .number-display.revealed .num-text{filter:none;transition:filter .3s}
   .number-display.shake{animation:shake .4s ease;border-color:var(--red)}
   .number-display.correct-flash{animation:flash-green .5s ease}
-  .reveal-hint{font-size:12px;color:var(--text3);position:absolute;bottom:10px;left:0;right:0;text-align:center;direction:rtl;transition:color .3s}
+  .reveal-hint{font-size:11px;color:var(--text3);position:absolute;bottom:8px;left:0;right:0;text-align:center;direction:rtl;transition:color .3s;white-space:nowrap;padding:0 8px}
   .number-display.revealed .reveal-hint{display:none}
 
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
@@ -134,7 +134,7 @@
 
 <div class="container" id="app">
   <div class="top-bar">
-    <h1>تدريب الأعداد العربية</h1>
+    <h1>تدريب الأرقام العربية</h1>
     <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="تبديل المظهر">
       <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
@@ -186,7 +186,7 @@
     <div class="btn-row" style="margin-top:12px">
       <button onclick="generateNumber()">
         <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        عدد جديد
+        رقم جديد
       </button>
       <button class="btn-primary" onclick="speak()" id="btn-speak">
         <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
@@ -219,6 +219,7 @@
 const ones=['','واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة','عشرة','أحد عشر','اثنا عشر','ثلاثة عشر','أربعة عشر','خمسة عشر','ستة عشر','سبعة عشر','ثمانية عشر','تسعة عشر'];
 const tens=['','','عشرون','ثلاثون','أربعون','خمسون','ستون','سبعون','ثمانون','تسعون'];
 
+/* Версия без огласовок — для отображения на экране */
 function numToArabic(n){
   if(n===0)return'صفر';
   let parts=[];
@@ -227,9 +228,50 @@ function numToArabic(n){
   if(n>=1e9){let b=Math.floor(n/1e9);parts.push(numToArabic(b)+' مليار');n=n%1e9;}
   if(n>=1e6){let m=Math.floor(n/1e6);parts.push(numToArabic(m)+' مليون');n=n%1e6;}
   if(n>=1000){let th=Math.floor(n/1000);if(th===1)parts.push('ألف');else if(th===2)parts.push('ألفان');else if(th<=10)parts.push(numToArabic(th)+' آلاف');else parts.push(numToArabic(th)+' ألفاً');n=n%1000;}
-  if(n>=100){let h=Math.floor(n/100);if(h===1)parts.push('مئة');else if(h===2)parts.push('مئتان');else parts.push(ones[h]+' مئة');n=n%100;}
+  if(n>=100){
+    let h=Math.floor(n/100);
+    const hundreds=['','مئة','مئتان','ثلاثمئة','أربعمئة','خمسمئة','ستمئة','سبعمئة','ثمانمئة','تسعمئة'];
+    parts.push(hundreds[h]);
+    n=n%100;
+  }
   if(n>0){if(n<20)parts.push(ones[n]);else{let t=Math.floor(n/10),o=n%10;if(o>0)parts.push(ones[o]+' و'+tens[t]);else parts.push(tens[t]);}}
   return parts.join(' و');
+}
+
+/* Версия с огласовками в именительном падеже — только для TTS */
+const onesTTS=['','وَاحِدٌ','اثْنَانِ','ثَلَاثَةٌ','أَرْبَعَةٌ','خَمْسَةٌ','سِتَّةٌ','سَبْعَةٌ','ثَمَانِيَةٌ','تِسْعَةٌ','عَشَرَةٌ','أَحَدَ عَشَرَ','اثْنَا عَشَرَ','ثَلَاثَةَ عَشَرَ','أَرْبَعَةَ عَشَرَ','خَمْسَةَ عَشَرَ','سِتَّةَ عَشَرَ','سَبْعَةَ عَشَرَ','ثَمَانِيَةَ عَشَرَ','تِسْعَةَ عَشَرَ'];
+const tensTTS=['','','عِشْرُونَ','ثَلَاثُونَ','أَرْبَعُونَ','خَمْسُونَ','سِتُّونَ','سَبْعُونَ','ثَمَانُونَ','تِسْعُونَ'];
+
+function numToArabicTTS(n){
+  if(n===0)return'صِفْرٌ';
+  let parts=[];
+  if(n>=1e15){let q=Math.floor(n/1e15);parts.push(numToArabicTTS(q)+' كُوَادْرِيلْيُونٌ');n=n%1e15;}
+  if(n>=1e12){let t=Math.floor(n/1e12);parts.push(numToArabicTTS(t)+' تْرِيلْيُونٌ');n=n%1e12;}
+  if(n>=1e9){let b=Math.floor(n/1e9);parts.push(numToArabicTTS(b)+' مِلْيَارٌ');n=n%1e9;}
+  if(n>=1e6){let m=Math.floor(n/1e6);parts.push(numToArabicTTS(m)+' مِلْيُونٌ');n=n%1e6;}
+  if(n>=1000){
+    let th=Math.floor(n/1000);
+    if(th===1)parts.push('أَلْفٌ');
+    else if(th===2)parts.push('أَلْفَانِ');
+    else if(th<=10)parts.push(numToArabicTTS(th)+' آلَافٌ');
+    else parts.push(numToArabicTTS(th)+' أَلْفًا');
+    n=n%1000;
+  }
+  if(n>=100){
+    let h=Math.floor(n/100);
+    const hundreds=['','مِئَةٌ','مِئَتَانِ','ثَلَاثُمِئَةٍ','أَرْبَعُمِئَةٍ','خَمْسُمِئَةٍ','سِتُّمِئَةٍ','سَبْعُمِئَةٍ','ثَمَانِمِئَةٍ','تِسْعُمِئَةٍ'];
+    parts.push(hundreds[h]);
+    n=n%100;
+  }
+  if(n>0){
+    if(n<20){parts.push(onesTTS[n]);}
+    else{
+      let t=Math.floor(n/10),o=n%10;
+      if(o>0)parts.push(onesTTS[o]+' وَ'+tensTTS[t]);
+      else parts.push(tensTTS[t]);
+    }
+  }
+  return parts.join(' وَ');
 }
 
 function fmt(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
@@ -249,6 +291,7 @@ function findArabicVoice(){
   let voices=synth.getVoices();
   let av=voices.filter(v=>v.lang.startsWith('ar'));
   if(av.length>0){arabicVoice=av[0];return true;}
+  /* Fallback: любой голос если арабского нет */
   return false;
 }
 
@@ -257,27 +300,36 @@ function initVoices(){
   if(synth.onvoiceschanged!==undefined){
     synth.onvoiceschanged=function(){findArabicVoice();};
   }
-  /* Android fallback: повторно пробуем через 500ms и 1500ms */
-  setTimeout(findArabicVoice,500);
-  setTimeout(findArabicVoice,1500);
+  /* Android Chrome грузит голоса асинхронно — повторяем несколько раз */
+  [100,500,1000,2000,3000].forEach(ms=>setTimeout(findArabicVoice,ms));
 }
 initVoices();
 
 /* ── iOS: разблокировка TTS через пользовательский жест ── */
 function checkIOSUnlock(){
-  let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
-  if(isIOS&&!ttsUnlocked){
+  let isMobile=/Android|iPad|iPhone|iPod/.test(navigator.userAgent);
+  if(isMobile&&!ttsUnlocked){
     document.getElementById('tts-overlay').classList.add('show');
   }
 }
 
 function unlockTTS(){
-  let utt=new SpeechSynthesisUtterance('');
+  /* Разблокировка через реальный жест пользователя */
+  synth.cancel();
+  let utt=new SpeechSynthesisUtterance(' ');
   utt.volume=0;
+  utt.rate=1;
+  utt.onend=function(){
+    ttsUnlocked=true;
+    findArabicVoice();
+  };
   synth.speak(utt);
-  ttsUnlocked=true;
+  /* Страховка если onend не сработает */
+  setTimeout(function(){
+    ttsUnlocked=true;
+    findArabicVoice();
+  },500);
   document.getElementById('tts-overlay').classList.remove('show');
-  findArabicVoice();
 }
 
 /* ── Тема ── */
@@ -365,7 +417,7 @@ function speak(){
   }
   clearTimerInterval();
   synth.cancel();
-  let text=numToArabic(currentNumber);
+  let text=numToArabicTTS(currentNumber);
   let utt=new SpeechSynthesisUtterance(text);
   utt.voice=arabicVoice;utt.lang=arabicVoice.lang;utt.rate=currentSpeed;
   utt.onend=startTimer;
@@ -431,7 +483,7 @@ function spawnConfetti(){
 }
 
 function checkAnswer(){
-  if(currentNumber===null){showStatus('اضغط "عدد جديد" أولاً','warn');return;}
+  if(currentNumber===null){showStatus('اضغط "رقم جديد" أولاً','warn');return;}
   clearTimerInterval();
   let user=document.getElementById('user-answer').value.replace(/[\s,،.]/g,'').trim();
   if(!user){showStatus('الرجاء كتابة إجابتك أولاً','warn');return;}
