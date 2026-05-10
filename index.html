@@ -46,7 +46,7 @@
 
   .label{font-size:13px;color:var(--text2);margin-bottom:6px;transition:color .3s}
   .controls{display:flex;gap:8px;align-items:center;margin-bottom:1rem;flex-wrap:wrap}
-  select{font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:background .3s,color .3s,border-color .3s;-webkit-appearance:auto}
+  select{font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:background .3s,color .3s,border-color .3s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 10px center;padding-left:28px}
 
   .speed-row{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
   .speed-lbl{font-size:13px;color:var(--text2);white-space:nowrap;display:flex;align-items:center;gap:6px;transition:color .3s}
@@ -114,10 +114,10 @@
   /* iOS TTS unlock overlay */
   .tts-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
   .tts-overlay.show{display:flex}
-  .tts-box{background:var(--surface);border-radius:16px;padding:2rem;max-width:320px;width:90%;text-align:center;direction:rtl}
+  .tts-box{background:var(--surface);border-radius:16px;padding:2rem;max-width:420px;width:95%;text-align:center;direction:rtl}
   .tts-box p{color:var(--text);font-size:15px;margin-bottom:1rem;line-height:1.6}
   .tts-box .voice-label{font-size:13px;color:var(--text2);margin-bottom:6px;text-align:right}
-  .tts-box select{width:100%;margin-bottom:1rem;font-size:14px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);direction:rtl}
+  .tts-box select{width:100%;margin-bottom:1rem;font-size:13px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);direction:ltr;text-align:left;white-space:normal;height:auto;min-height:42px}
   .tts-box .no-voice{font-size:13px;color:var(--red);margin-bottom:1rem;line-height:1.5;display:none}
   .tts-box button{width:100%;justify-content:center;padding:12px;font-size:15px}
 </style>
@@ -127,15 +127,14 @@
 <!-- TTS unlock + voice select -->
 <div class="tts-overlay" id="tts-overlay">
   <div class="tts-box">
-    <p>اختر الصوت وفعّل الصوت</p>
+    <p>اختر الصوت وابدأ</p>
     <div class="no-voice" id="no-voice-msg">
       لا توجد أصوات عربية على هذا الجهاز. يرجى تثبيت اللغة العربية في إعدادات النظام ثم إعادة فتح الصفحة.
     </div>
-    <div class="voice-label" id="voice-label">اختر الصوت العربي:</div>
+    <div class="voice-label" id="voice-label">الصوت المتاح:</div>
     <select id="voice-select-overlay" style="display:none"></select>
     <button class="btn-primary" onclick="unlockTTS()">
-      <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-      تفعيل الصوت
+      ابدأ التدريب
     </button>
   </div>
 </div>
@@ -161,11 +160,11 @@
         <option value="easy">سهل (حتى ٩٩٩)</option>
         <option value="medium" selected>متوسط (حتى ٩٩٩ ألف)</option>
         <option value="hard">صعب (حتى ٩٩٩ مليون)</option>
-        <option value="expert">خبير (حتى ٩٩٩ مليار)</option>
-        <option value="master">ماهر (حتى ٩٩٩ تريليون)</option>
+        <option value="expert">متقدم (حتى ٩٩٩ مليار)</option>
+        <option value="master">محترف (حتى ٩٩٩ تريليون)</option>
         <option value="legend">أسطوري (حتى ٩٩٩ كوادريليون)</option>
       </select>
-      <select id="time-limit" onchange="clearTimerInterval()">
+      <select id="time-limit" onchange="clearTimerInterval()" style="min-width:120px">
         <option value="0">بلا توقيت</option>
         <option value="60">١ دقيقة</option>
         <option value="30">٣٠ ثانية</option>
@@ -184,7 +183,7 @@
 
     <div class="number-display hidden" id="num-display" onclick="revealNumber()">
       <span class="num-text" id="num-text">—</span>
-      <div class="reveal-hint">انقر للكشف</div>
+      <div class="reveal-hint">اضغط للكشف</div>
       <div class="confetti-container" id="confetti"></div>
     </div>
 
@@ -210,7 +209,7 @@
   <hr class="divider">
 
   <div class="section">
-    <div class="label">اكتب الرقم بالأرقام العادية:</div>
+    <div class="label">اكتب الرقم الذي سمعته:</div>
     <input type="text" id="user-answer" placeholder="مثال: 377899" inputmode="numeric" onkeydown="if(event.key==='Enter')checkAnswer()">
     <div class="btn-row" style="margin-top:8px">
       <button class="btn-primary btn-full" onclick="checkAnswer()">
@@ -246,24 +245,60 @@ function numToArabic(n){
   return parts.join(' و');
 }
 
-/* Версия с огласовками в именительном падеже — только для TTS */
+/* Версия с огласовками — для TTS с правильными падежами تمييز */
 const onesTTS=['','وَاحِدٌ','اثْنَانِ','ثَلَاثَةٌ','أَرْبَعَةٌ','خَمْسَةٌ','سِتَّةٌ','سَبْعَةٌ','ثَمَانِيَةٌ','تِسْعَةٌ','عَشَرَةٌ','أَحَدَ عَشَرَ','اثْنَا عَشَرَ','ثَلَاثَةَ عَشَرَ','أَرْبَعَةَ عَشَرَ','خَمْسَةَ عَشَرَ','سِتَّةَ عَشَرَ','سَبْعَةَ عَشَرَ','ثَمَانِيَةَ عَشَرَ','تِسْعَةَ عَشَرَ'];
 const tensTTS=['','','عِشْرُونَ','ثَلَاثُونَ','أَرْبَعُونَ','خَمْسُونَ','سِتُّونَ','سَبْعُونَ','ثَمَانُونَ','تِسْعُونَ'];
+
+/* Правило тмийиз: определяем падеж по числу перед единицей измерения
+   3–10   → مجرور جمع  (напр. ثلاثة مليارات)
+   11–99  → منصوب مفرد (напр. خمسة وعشرون ملياراً)
+   100+   → مجرور مفرد (напр. مئة مليارٍ)
+   2      → مجرور مفرد مثنى (напр. ملياران)
+   1      → мرفوع مفرد (напр. مليارٌ واحد) */
+function getTamyizCase(n){
+  let last2=n%100;
+  let last1=n%10;
+  if(n===1)return'rafa'; /* مرفوع */
+  if(n===2)return'dual'; /* مثنى */
+  if(n>=3&&n<=10)return'jar_pl'; /* مجرور جمع */
+  if(last2>=11&&last2<=99)return'nasb'; /* منصوب مفرد */
+  return'jar'; /* مجرور مفرد — для 100+ */
+}
 
 function numToArabicTTS(n){
   if(n===0)return'صِفْرٌ';
   let parts=[];
-  if(n>=1e15){let q=Math.floor(n/1e15);parts.push(numToArabicTTS(q)+' كُوَادْرِيلْيُونٌ');n=n%1e15;}
-  if(n>=1e12){let t=Math.floor(n/1e12);parts.push(numToArabicTTS(t)+' تْرِيلْيُونٌ');n=n%1e12;}
-  if(n>=1e9){let b=Math.floor(n/1e9);parts.push(numToArabicTTS(b)+' مِلْيَارٌ');n=n%1e9;}
-  if(n>=1e6){let m=Math.floor(n/1e6);parts.push(numToArabicTTS(m)+' مِلْيُونٌ');n=n%1e6;}
+
+  if(n>=1e15){
+    let q=Math.floor(n/1e15); n=n%1e15;
+    let c=getTamyizCase(q);
+    let unit=c==='rafa'?'كُوَادْرِيلْيُونٌ':c==='dual'?'كُوَادْرِيلْيُونَانِ':c==='jar_pl'?'كُوَادْرِيلْيُونَاتٍ':c==='nasb'?'كُوَادْرِيلْيُونًا':'كُوَادْرِيلْيُونٍ';
+    parts.push(numToArabicTTS(q)+' '+unit);
+  }
+  if(n>=1e12){
+    let t=Math.floor(n/1e12); n=n%1e12;
+    let c=getTamyizCase(t);
+    let unit=c==='rafa'?'تْرِيلْيُونٌ':c==='dual'?'تْرِيلْيُونَانِ':c==='jar_pl'?'تْرِيلْيُونَاتٍ':c==='nasb'?'تْرِيلْيُونًا':'تْرِيلْيُونٍ';
+    parts.push(numToArabicTTS(t)+' '+unit);
+  }
+  if(n>=1e9){
+    let b=Math.floor(n/1e9); n=n%1e9;
+    let c=getTamyizCase(b);
+    let unit=c==='rafa'?'مِلْيَارٌ':c==='dual'?'مِلْيَارَانِ':c==='jar_pl'?'مِلْيَارَاتٍ':c==='nasb'?'مِلْيَارًا':'مِلْيَارٍ';
+    parts.push(numToArabicTTS(b)+' '+unit);
+  }
+  if(n>=1e6){
+    let m=Math.floor(n/1e6); n=n%1e6;
+    let c=getTamyizCase(m);
+    let unit=c==='rafa'?'مِلْيُونٌ':c==='dual'?'مِلْيُونَانِ':c==='jar_pl'?'مَلَايِينٍ':c==='nasb'?'مِلْيُونًا':'مِلْيُونٍ';
+    parts.push(numToArabicTTS(m)+' '+unit);
+  }
   if(n>=1000){
-    let th=Math.floor(n/1000);
+    let th=Math.floor(n/1000); n=n%1000;
     if(th===1)parts.push('أَلْفٌ');
     else if(th===2)parts.push('أَلْفَانِ');
-    else if(th<=10)parts.push(numToArabicTTS(th)+' آلَافٌ');
+    else if(th<=10)parts.push(numToArabicTTS(th)+' آلَافٍ');
     else parts.push(numToArabicTTS(th)+' أَلْفًا');
-    n=n%1000;
   }
   if(n>=100){
     let h=Math.floor(n/100);
