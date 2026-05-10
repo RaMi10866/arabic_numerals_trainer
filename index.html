@@ -96,6 +96,9 @@
   .btn-full{width:100%;justify-content:center;padding:12px 14px;font-size:16px}
 
   input[type="text"]{width:100%;font-size:22px;direction:ltr;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);letter-spacing:2px;outline:none;transition:border-color .2s,background .3s,color .3s;-webkit-appearance:none}
+  input[type="text"]::placeholder{letter-spacing:normal;direction:rtl;font-size:16px;color:var(--text3)}
+  input[type="text"]::-webkit-input-placeholder{letter-spacing:normal;direction:rtl;font-size:16px;color:var(--text3)}
+  input[type="text"]::-moz-placeholder{letter-spacing:normal;direction:rtl;font-size:16px;color:var(--text3)}
   input[type="text"]:focus{border-color:var(--accent)}
   input[type="text"].input-error{border-color:var(--red);animation:shake .4s ease}
   input[type="text"].input-ok{border-color:var(--green)}
@@ -323,6 +326,8 @@ let currentNumber=null;
 let score={total:0,correct:0,wrong:0};
 let synth=window.speechSynthesis;
 let arabicVoice=null;
+let isMobileDevice=/Android|iPad|iPhone|iPod/.test(navigator.userAgent);
+let maxSpeed=isMobileDevice?1.8:3.0;
 let currentSpeed=1.0;
 let timerInterval=null;
 let timerTotal=0;
@@ -473,6 +478,17 @@ function updateSpeed(){
   document.getElementById('speed-val').textContent=currentSpeed.toFixed(1)+'×';
 }
 
+function initSpeedSlider(){
+  let slider=document.getElementById('speed');
+  slider.max=maxSpeed.toFixed(1);
+  slider.value='1.0';
+  if(isMobileDevice){
+    /* На мобильных показываем подсказку */
+    let lbl=document.querySelector('.speed-lbl');
+    lbl.title='على الأجهزة المحمولة الحد الأقصى '+maxSpeed+'×';
+  }
+}
+
 function generateNumber(){
   clearTimerInterval();
   let[min,max]=ranges[document.getElementById('level').value];
@@ -616,6 +632,7 @@ function updateScore(){
 /* ── Инициализация ── */
 let savedTheme=localStorage.getItem('theme');
 applyTheme(savedTheme==='dark');
+initSpeedSlider();
 generateNumber();
 checkIOSUnlock();
 </script>
