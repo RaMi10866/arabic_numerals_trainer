@@ -97,10 +97,10 @@
   .btn-primary svg{stroke:var(--accent-text)}
   .btn-full{width:100%;justify-content:center;padding:12px 14px;font-size:16px}
 
-  input[type="text"]{width:100%;font-size:22px;direction:ltr;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);letter-spacing:2px;outline:none;transition:border-color .2s,background .3s,color .3s;-webkit-appearance:none}
-  input[type="text"]::placeholder{letter-spacing:normal;direction:rtl;font-size:16px;color:var(--text3)}
-  input[type="text"]::-webkit-input-placeholder{letter-spacing:normal;direction:rtl;font-size:16px;color:var(--text3)}
-  input[type="text"]::-moz-placeholder{letter-spacing:normal;direction:rtl;font-size:16px;color:var(--text3)}
+  input[type="text"]{width:100%;font-size:18px;direction:ltr;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);letter-spacing:2px;outline:none;transition:border-color .2s,background .3s,color .3s;-webkit-appearance:none}
+  input[type="text"]::placeholder{letter-spacing:normal;direction:rtl;font-size:18px;color:var(--text3)}
+  input[type="text"]::-webkit-input-placeholder{letter-spacing:normal;direction:rtl;font-size:18px;color:var(--text3)}
+  input[type="text"]::-moz-placeholder{letter-spacing:normal;direction:rtl;font-size:18px;color:var(--text3)}
   input[type="text"]:focus{border-color:var(--accent)}
   input[type="text"].input-error{border-color:var(--red);animation:shake .4s ease}
   input[type="text"].input-ok{border-color:var(--green)}
@@ -176,9 +176,9 @@
         <div class="label" style="margin:0">الوقت:</div>
         <select id="time-limit" onchange="clearTimerInterval()" class="filter-select">
           <option value="0">بلا توقيت</option>
-          <option value="60">١ دقيقة</option>
           <option value="30">٣٠ ثانية</option>
           <option value="10">١٠ ثوانٍ</option>
+          <option value="5">٥ ثوانٍ</option>
         </select>
       </div>
     </div>
@@ -577,17 +577,35 @@ function startTimer(){
 }
 
 function timeUp(){
+  let inp=document.getElementById('user-answer');
+  let user=inp.value.replace(/[\s,،.]/g,'').trim();
+  /* Если введено правильное число — засчитываем как верный ответ */
+  if(user&&parseInt(user,10)===currentNumber){
+    checkAnswer();
+    return;
+  }
   score.total++;score.wrong++;updateScore();
   document.getElementById('num-display').classList.add('shake');
   setTimeout(()=>document.getElementById('num-display').classList.remove('shake'),500);
-  let inp=document.getElementById('user-answer');
   inp.classList.add('input-error');setTimeout(()=>inp.classList.remove('input-error'),600);
   setStatus('انتهى الوقت — <span class="status-num">'+fmt(currentNumber)+'</span><span class="arabic-part">'+numToArabic(currentNumber)+'</span>','err');
-  document.getElementById('arabic-display').textContent=numToArabic(currentNumber);
-  document.getElementById('arabic-display').style.display='block';
   document.getElementById('timer-bar-wrap').style.display='none';
   document.getElementById('timer-text').style.display='none';
   revealNumber();
+  /* Блокируем и через 3 секунды — новое число */
+  let btn=document.querySelector('.btn-full');
+  btn.disabled=true;btn.style.opacity='0.5';
+  inp.disabled=true;
+  let countdown=3;
+  let countEl=document.createElement('span');
+  countEl.style.cssText='margin-right:8px;font-size:13px;opacity:0.7';
+  countEl.textContent='('+countdown+')';
+  btn.appendChild(countEl);
+  let countTimer=setInterval(function(){
+    countdown--;
+    countEl.textContent='('+countdown+')';
+    if(countdown<=0){clearInterval(countTimer);generateNumber();}
+  },1000);
 }
 
 function spawnConfetti(){
@@ -618,7 +636,6 @@ function checkAnswer(){
     spawnConfetti();
     setStatus('ممتاز! <span class="status-num">'+fmt(currentNumber)+'</span><span class="arabic-part">'+numToArabic(currentNumber)+'</span>','ok');
     revealNumber();
-    /* Блокируем кнопку и поле, через 3 секунды — новое число */
     let btn=document.querySelector('.btn-full');
     btn.disabled=true;btn.style.opacity='0.5';
     inp.disabled=true;
@@ -643,8 +660,6 @@ function checkAnswer(){
     document.getElementById('num-display').classList.add('shake');
     setTimeout(()=>document.getElementById('num-display').classList.remove('shake'),500);
     setStatus('الصحيح: <span class="status-num">'+fmt(currentNumber)+'</span><span class="arabic-part">'+numToArabic(currentNumber)+'</span>','err');
-    document.getElementById('arabic-display').textContent=numToArabic(currentNumber);
-    document.getElementById('arabic-display').style.display='block';
     revealNumber();
     /* Блокируем и через 3 секунды — новое число */
     let btn2=document.querySelector('.btn-full');
