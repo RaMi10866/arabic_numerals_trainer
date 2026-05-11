@@ -45,7 +45,9 @@
   .score-lbl{font-size:12px;color:var(--text2);margin-top:2px;transition:color .3s}
 
   .label{font-size:13px;color:var(--text2);margin-bottom:6px;transition:color .3s}
-  .controls{display:flex;gap:8px;align-items:center;margin-bottom:1rem;flex-wrap:wrap}
+  .controls{display:flex;gap:12px;align-items:center;margin-bottom:1rem;flex-wrap:wrap}
+  .filter-group{display:flex;align-items:center;gap:6px;flex-shrink:0}
+  .filter-select{min-width:180px}
   select{font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:background .3s,color .3s,border-color .3s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 10px center;padding-left:28px}
 
   .speed-row{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
@@ -158,22 +160,27 @@
 
   <div class="section">
     <div class="controls">
-      <div class="label" style="margin:0">المستوى:</div>
-      <select id="level" onchange="generateNumber()">
-        <option value="easy">سهل  ( حتى ٩٩٩ )</option>
-        <option value="medium" selected>متوسط  ( حتى ٩٩٩ ألفاً )</option>
-        <option value="hard">صعب  ( حتى ٩٩٩ مليوناً )</option>
-        <option value="expert">متقدم  ( حتى ٩٩٩ ملياراً )</option>
-        <option value="master">محترف  ( حتى ٩٩٩ تريليوناً )</option>
-        <option value="legend">أسطوري  ( حتى ٩٩٩ كوادريليوناً )</option>
-      </select>
-      <div class="label" style="margin:0">الوقت:</div>
-      <select id="time-limit" onchange="clearTimerInterval()" style="min-width:120px">
-        <option value="0">بلا توقيت</option>
-        <option value="60">١ دقيقة</option>
-        <option value="30">٣٠ ثانية</option>
-        <option value="10">١٠ ثوانٍ</option>
-      </select>
+      <div class="filter-group">
+        <div class="label" style="margin:0">المستوى:</div>
+        <select id="level" onchange="generateNumber()" class="filter-select">
+          <option value="easy">سهل  ( حتى ٩٩٩ )</option>
+          <option value="medium" selected>متوسط  ( حتى ٩٩٩ ألفاً )</option>
+          <option value="hard">صعب  ( حتى ٩٩٩ مليوناً )</option>
+          <option value="expert">متقدم  ( حتى ٩٩٩ ملياراً )</option>
+          <option value="master">محترف  ( حتى ٩٩٩ تريليوناً )</option>
+          <option value="legend">أسطوري  ( حتى ٩٩٩ كوادريليوناً )</option>
+          <option value="random">عشوائي  ( كل الأرقام )</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="label" style="margin:0">الوقت:</div>
+        <select id="time-limit" onchange="clearTimerInterval()" class="filter-select">
+          <option value="0">بلا توقيت</option>
+          <option value="60">١ دقيقة</option>
+          <option value="30">٣٠ ثانية</option>
+          <option value="10">١٠ ثوانٍ</option>
+        </select>
+      </div>
     </div>
 
     <div class="speed-row">
@@ -200,12 +207,12 @@
         رقم جديد
       </button>
       <button class="btn-primary" onclick="speak()" id="btn-speak">
-        <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-        استمع
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        تشغيل
       </button>
       <button onclick="speak()" id="btn-repeat" style="display:none">
         <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-        أعِد
+        إعادة
       </button>
     </div>
   </div>
@@ -217,8 +224,8 @@
     <input type="text" id="user-answer" placeholder="مثال: 377899" inputmode="numeric" onkeydown="if(event.key==='Enter')checkAnswer()">
     <div class="btn-row" style="margin-top:8px">
       <button class="btn-primary btn-full" onclick="checkAnswer()">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        تحقق
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        إرسال
       </button>
     </div>
     <div class="status" id="status"></div>
@@ -469,10 +476,11 @@ function toggleTheme(){applyTheme(!isDark);}
 
 /* ── Числа ── */
 const ranges={
-  easy:[100,999],medium:[1000,999999],hard:[1000000,999999999],
+  easy:[10,999],medium:[1000,999999],hard:[1000000,999999999],
   expert:[1000000000,999999999999],master:[1000000000000,999999999999999],
   legend:[1000000000000000,999999999999999999]
 };
+const randomLevels=['easy','medium','hard','expert','master','legend'];
 
 function updateSpeed(){
   currentSpeed=parseFloat(document.getElementById('speed').value);
@@ -492,7 +500,9 @@ function initSpeedSlider(){
 
 function generateNumber(){
   clearTimerInterval();
-  let[min,max]=ranges[document.getElementById('level').value];
+  let level=document.getElementById('level').value;
+  if(level==='random') level=randomLevels[Math.floor(Math.random()*randomLevels.length)];
+  let[min,max]=ranges[level];
   currentNumber=Math.floor(Math.random()*(max-min+1))+min;
   let d=document.getElementById('num-display');
   document.getElementById('num-text').textContent=fmt(currentNumber);
