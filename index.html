@@ -508,14 +508,19 @@ function generateNumber(){
   document.getElementById('num-text').textContent=fmt(currentNumber);
   d.classList.remove('revealed','shake','correct-flash');d.classList.add('hidden');
   document.getElementById('arabic-display').style.display='none';
-  document.getElementById('user-answer').value='';
-  document.getElementById('user-answer').className='';
+  let inp=document.getElementById('user-answer');
+  inp.value='';inp.className='';inp.disabled=false;
   document.getElementById('status').style.display='none';
   document.getElementById('btn-repeat').style.display='none';
   document.getElementById('btn-speak').style.display='flex';
   document.getElementById('timer-bar-wrap').style.display='none';
   document.getElementById('timer-text').style.display='none';
   document.getElementById('confetti').innerHTML='';
+  /* Сбрасываем кнопку إرسال */
+  let btn=document.querySelector('.btn-full');
+  btn.disabled=false;btn.style.opacity='';
+  let countEl=btn.querySelector('span');
+  if(countEl)countEl.remove();
 }
 
 function revealNumber(){
@@ -613,6 +618,25 @@ function checkAnswer(){
     spawnConfetti();
     setStatus('ممتاز! <span class="status-num">'+fmt(currentNumber)+'</span><span class="arabic-part">'+numToArabic(currentNumber)+'</span>','ok');
     revealNumber();
+    /* Блокируем кнопку и поле, через 3 секунды — новое число */
+    let btn=document.querySelector('.btn-full');
+    btn.disabled=true;btn.style.opacity='0.5';
+    inp.disabled=true;
+    let countdown=3;
+    let countEl=document.createElement('span');
+    countEl.style.cssText='margin-right:8px;font-size:13px;opacity:0.7';
+    countEl.textContent='('+countdown+')';
+    btn.appendChild(countEl);
+    let countTimer=setInterval(function(){
+      countdown--;
+      countEl.textContent='('+countdown+')';
+      if(countdown<=0){
+        clearInterval(countTimer);
+        btn.disabled=false;btn.style.opacity='';
+        inp.disabled=false;
+        generateNumber();
+      }
+    },1000);
   } else {
     score.wrong++;
     inp.classList.add('input-error');setTimeout(()=>inp.classList.remove('input-error'),600);
@@ -622,6 +646,23 @@ function checkAnswer(){
     document.getElementById('arabic-display').textContent=numToArabic(currentNumber);
     document.getElementById('arabic-display').style.display='block';
     revealNumber();
+    /* Блокируем и через 3 секунды — новое число */
+    let btn2=document.querySelector('.btn-full');
+    btn2.disabled=true;btn2.style.opacity='0.5';
+    inp.disabled=true;
+    let countdown2=3;
+    let countEl2=document.createElement('span');
+    countEl2.style.cssText='margin-right:8px;font-size:13px;opacity:0.7';
+    countEl2.textContent='('+countdown2+')';
+    btn2.appendChild(countEl2);
+    let countTimer2=setInterval(function(){
+      countdown2--;
+      countEl2.textContent='('+countdown2+')';
+      if(countdown2<=0){
+        clearInterval(countTimer2);
+        generateNumber();
+      }
+    },1000);
   }
   updateScore();
 }
