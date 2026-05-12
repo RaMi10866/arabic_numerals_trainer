@@ -186,7 +186,6 @@
           <option value="hard">صعب  ( حتى ٩٩٩ مليوناً )</option>
           <option value="expert">متقدم  ( حتى ٩٩٩ ملياراً )</option>
           <option value="master">محترف  ( حتى ٩٩٩ تريليوناً )</option>
-          <option value="legend">أسطوري  ( حتى ٩٩٩ كوادريليوناً )</option>
           <option value="random">عشوائي  ( كل الأرقام )</option>
         </select>
       </div>
@@ -233,7 +232,7 @@
         <span data-i18n="repeat">إعادة</span>
       </button>
     </div>
-  </div>
+</div>
 
   <hr class="divider">
 
@@ -260,9 +259,9 @@ const i18n={
     play:'تشغيل',repeat:'إعادة',send:'إرسال',new_number:'رقم جديد',
     input_label:'اكتب الرقم الذي سمعته:',reveal:'اضغط للكشف',
     no_timer:'بلا توقيت',
-    easy:'سهل  ( حتى 999 )',medium:'متوسط  ( حتى 999,000 )',
-    hard:'صعب  ( حتى 999,000,000 )',expert:'متقدم  ( حتى 999 مليار )',
-    master:'محترف  ( حتى 999 تريليون )',legend:'أسطوري  ( حتى 999 كوادريليون )',
+    easy:'سهل  ( حتى ٩٩٩ )',medium:'متوسط  ( حتى ٩٩٩ ألفاً )',
+    hard:'صعب  ( حتى ٩٩٩ مليوناً )',expert:'متقدم  ( حتى ٩٩٩ ملياراً )',
+    master:'محترف  ( حتى ٩٩٩ تريليوناً )',
     random:'عشوائي  ( كل الأرقام )',
     s30:'٣٠ ثانية',s10:'١٠ ثوانٍ',s5:'٥ ثوانٍ',
     total:'إجمالي',correct_score:'صحيح',wrong_score:'خطأ',
@@ -277,9 +276,9 @@ const i18n={
     play:'Слушать',repeat:'Повтор',send:'Отправить',new_number:'Новое число',
     input_label:'Напишите услышанное число:',reveal:'Показать число',
     no_timer:'Без таймера',
-    easy:'Лёгкий  (до 999)',medium:'Средний  (до 999 тыс)',
+    easy:'Лёгкий  (до 999)',medium:'Средний  (до 999 тыс.)',
     hard:'Сложный  (до 999 млн)',expert:'Продвинутый  (до 999 млрд)',
-    master:'Профи  (до 999 трлн)',legend:'Легенда  (до 999 квадрлн)',
+    master:'Профи  (до 999 трлн)',
     random:'Случайный  (все уровни)',
     s30:'30 секунд',s10:'10 секунд',s5:'5 секунд',
     total:'Всего',correct_score:'Верно',wrong_score:'Неверно',
@@ -296,7 +295,7 @@ const i18n={
     no_timer:'No timer',
     easy:'Easy  (up to 999)',medium:'Medium  (up to 999K)',
     hard:'Hard  (up to 999M)',expert:'Advanced  (up to 999B)',
-    master:'Pro  (up to 999T)',legend:'Legend  (up to 999Q)',
+    master:'Pro  (up to 999T)',
     random:'Random  (all levels)',
     s30:'30 seconds',s10:'10 seconds',s5:'5 seconds',
     total:'Total',correct_score:'Correct',wrong_score:'Wrong',
@@ -345,7 +344,7 @@ function _applyLang(t,lang){
     if(t[key]!==undefined) el.placeholder=t[key];
   });
   /* Опции уровней */
-  const levelMap={easy:'easy',medium:'medium',hard:'hard',expert:'expert',master:'master',legend:'legend',random:'random'};
+  const levelMap={easy:'easy',medium:'medium',hard:'hard',expert:'expert',master:'master',random:'random'};
   const lvlSel=document.getElementById('level');
   Array.from(lvlSel.options).forEach(opt=>{
     if(t[opt.value]!==undefined) opt.textContent=t[opt.value];
@@ -372,79 +371,74 @@ function _applyLang(t,lang){
 const ones=['','واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة','عشرة','أحد عشر','اثنا عشر','ثلاثة عشر','أربعة عشر','خمسة عشر','ستة عشر','سبعة عشر','ثمانية عشر','تسعة عشر'];
 const tens=['','','عشرون','ثلاثون','أربعون','خمسون','ستون','سبعون','ثمانون','تسعون'];
 
-/* Версия без огласовок — для отображения на экране */
-function numToArabic(n){
-  if(n===0)return'صفر';
-  let parts=[];
-  if(n>=1e15){let q=Math.floor(n/1e15);parts.push(numToArabic(q)+' كوادريليون');n=n%1e15;}
-  if(n>=1e12){let t=Math.floor(n/1e12);parts.push(numToArabic(t)+' تريليون');n=n%1e12;}
-  if(n>=1e9){let b=Math.floor(n/1e9);parts.push(numToArabic(b)+' مليار');n=n%1e9;}
-  if(n>=1e6){let m=Math.floor(n/1e6);parts.push(numToArabic(m)+' مليون');n=n%1e6;}
-  if(n>=1000){let th=Math.floor(n/1000);if(th===1)parts.push('ألف');else if(th===2)parts.push('ألفان');else if(th<=10)parts.push(numToArabic(th)+' آلاف');else parts.push(numToArabic(th)+' ألفاً');n=n%1000;}
-  if(n>=100){
-    let h=Math.floor(n/100);
-    const hundreds=['','مئة','مئتان','ثلاثمئة','أربعمئة','خمسمئة','ستمئة','سبعمئة','ثمانمئة','تسعمئة'];
-    parts.push(hundreds[h]);
-    n=n%100;
-  }
-  if(n>0){if(n<20)parts.push(ones[n]);else{let t=Math.floor(n/10),o=n%10;if(o>0)parts.push(ones[o]+' و'+tens[t]);else parts.push(tens[t]);}}
-  return parts.join(' و');
-}
-
-/* Версия с огласовками — для TTS с правильными падежами تمييز */
 const onesTTS=['','وَاحِدٌ','اثْنَانِ','ثَلَاثَةٌ','أَرْبَعَةٌ','خَمْسَةٌ','سِتَّةٌ','سَبْعَةٌ','ثَمَانِيَا','تِسْعَةٌ','عَشَرَةٌ','أَحَدَ عَشَرَ','اثْنَا عَشَرَ','ثَلَاثَةَ عَشَرَ','أَرْبَعَةَ عَشَرَ','خَمْسَةَ عَشَرَ','سِتَّةَ عَشَرَ','سَبْعَةَ عَشَرَ','ثَمَانِيَةَ عَشَرَ','تِسْعَةَ عَشَرَ'];
+const onesTTS_idafa=['','','','ثَلَاثَةْ','أَرْبَعَةْ','خَمْسَةْ','سِتَّةْ','سَبْعَةْ','ثَمَانِيَا','تِسْعَةْ','عَشَرَةْ'];
 const tensTTS=['','','عِشْرُونَ','ثَلَاثُونَ','أَرْبَعُونَ','خَمْسُونَ','سِتُّونَ','سَبْعُونَ','ثَمَانُونَ','تِسْعُونَ'];
 
-/* Правило тмийиз: определяем падеж по числу перед единицей измерения
-   3–10   → مجرور جمع  (напр. ثلاثة مليارات)
-   11–99  → منصوب مفرد (напр. خمسة وعشرون ملياراً)
-   100+   → مجرور مفرد (напр. مئة مليارٍ)
-   2      → مجرور مفرد مثنى (напр. ملياران)
-   1      → мرفوع مفرد (напр. مليارٌ واحد) */
 function getTamyizCase(n){
   let last2=n%100;
-  let last1=n%10;
-  if(n===1)return'rafa'; /* مرفوع */
-  if(n===2)return'dual'; /* مثنى */
-  if(n>=3&&n<=10)return'jar_pl'; /* مجرور جمع */
-  if(last2>=11&&last2<=99)return'nasb'; /* منصوب مفرد */
-  return'jar'; /* مجرور مفرد — для 100+ */
+  if(last2===1)return'rafa';
+  if(last2===2)return'dual';
+  if(last2>=3&&last2<=10)return'jar_pl';
+  if(last2>=11&&last2<=99)return'nasb';
+  return'jar';
 }
 
-function numToArabicTTS(n){
+function numToArabicTTS(n,idafa){
   if(n===0)return'صِفْرٌ';
   let parts=[];
 
-  if(n>=1e15){
-    let q=Math.floor(n/1e15); n=n%1e15;
-    let c=getTamyizCase(q);
-    let unit=c==='rafa'?'كُوَادْرِيلْيُونٌ':c==='dual'?'كُوَادْرِيلْيُونَانِ':c==='jar_pl'?'كُوَادْرِيلْيُونَاتٍ':c==='nasb'?'كُوَادْرِيلْيُونًا':'كُوَادْرِيلْيُونٍ';
-    parts.push(numToArabicTTS(q)+' '+unit);
-  }
   if(n>=1e12){
     let t=Math.floor(n/1e12); n=n%1e12;
     let c=getTamyizCase(t);
-    let unit=c==='rafa'?'تْرِيلْيُونٌ':c==='dual'?'تْرِيلْيُونَانِ':c==='jar_pl'?'تْرِيلْيُونَاتٍ':c==='nasb'?'تْرِيلْيُونًا':'تْرِيلْيُونٍ';
-    parts.push(numToArabicTTS(t)+' '+unit);
+    if(t>=100&&t%100===1){
+      parts.push(numToArabicTTS(Math.floor(t/100)*100)+' تْرِيلْيُونٍ وَتْرِيلْيُونٌ');
+    } else if(t>=100&&t%100===2){
+      parts.push(numToArabicTTS(Math.floor(t/100)*100)+' تْرِيلْيُونٍ وَتْرِيلْيُونَانِ');
+    } else {
+      let unit=c==='rafa'?'تْرِيلْيُونٌ':c==='dual'?'تْرِيلْيُونَانِ':c==='jar_pl'?'تْرِيلْيُونَاتْ':c==='nasb'?'تْرِيلْيُونًا':'تْرِيلْيُونٍ';
+      let tStr=c==='jar_pl'&&t<=10?onesTTS_idafa[t]:numToArabicTTS(t,c==='jar_pl');
+      parts.push(tStr+' '+unit);
+    }
   }
   if(n>=1e9){
     let b=Math.floor(n/1e9); n=n%1e9;
     let c=getTamyizCase(b);
-    let unit=c==='rafa'?'مِلْيَارٌ':c==='dual'?'مِلْيَارَانِ':c==='jar_pl'?'مِلْيَارَاتٍ':c==='nasb'?'مِلْيَارًا':'مِلْيَارٍ';
-    parts.push(numToArabicTTS(b)+' '+unit);
+    if(b>=100&&b%100===1){
+      parts.push(numToArabicTTS(Math.floor(b/100)*100)+' مِلْيَارٍ وَمِلْيَارٌ');
+    } else if(b>=100&&b%100===2){
+      parts.push(numToArabicTTS(Math.floor(b/100)*100)+' مِلْيَارٍ وَمِلْيَارَانِ');
+    } else {
+      let unit=c==='rafa'?'مِلْيَارٌ':c==='dual'?'مِلْيَارَانِ':c==='jar_pl'?'مِلْيَارَاتْ':c==='nasb'?'مِلْيَارًا':'مِلْيَارٍ';
+      let bStr=c==='jar_pl'&&b<=10?onesTTS_idafa[b]:numToArabicTTS(b,c==='jar_pl');
+      parts.push(bStr+' '+unit);
+    }
   }
   if(n>=1e6){
     let m=Math.floor(n/1e6); n=n%1e6;
     let c=getTamyizCase(m);
-    let unit=c==='rafa'?'مِلْيُونٌ':c==='dual'?'مِلْيُونَانِ':c==='jar_pl'?'مَلَايِينٍ':c==='nasb'?'مِلْيُونًا':'مِلْيُونٍ';
-    parts.push(numToArabicTTS(m)+' '+unit);
+    if(m>=100&&m%100===1){
+      parts.push(numToArabicTTS(Math.floor(m/100)*100)+' مِلْيُونٍ وَمِلْيُونٌ');
+    } else if(m>=100&&m%100===2){
+      parts.push(numToArabicTTS(Math.floor(m/100)*100)+' مِلْيُونٍ وَمِلْيُونَانِ');
+    } else {
+      let unit=c==='rafa'?'مِلْيُونٌ':c==='dual'?'مِلْيُونَانِ':c==='jar_pl'?'مَلَايِينْ':c==='nasb'?'مِلْيُونًا':'مِلْيُونٍ';
+      let mStr=c==='jar_pl'&&m<=10?onesTTS_idafa[m]:numToArabicTTS(m,c==='jar_pl');
+      parts.push(mStr+' '+unit);
+    }
   }
   if(n>=1000){
     let th=Math.floor(n/1000); n=n%1000;
-    if(th===1)parts.push('أَلْفٌ');
+    let c=getTamyizCase(th);
+    if(th>=100&&th%100===1){
+      parts.push(numToArabicTTS(Math.floor(th/100)*100)+' أَلْفٍ وَأَلْفٌ');
+    } else if(th>=100&&th%100===2){
+      parts.push(numToArabicTTS(Math.floor(th/100)*100)+' أَلْفٍ وَأَلْفَانِ');
+    } else if(th===1)parts.push('أَلْفٌ');
     else if(th===2)parts.push('أَلْفَانِ');
-    else if(th<=10)parts.push(numToArabicTTS(th)+' آلَافٍ');
-    else parts.push(numToArabicTTS(th)+' أَلْفًا');
+    else if(c==='jar_pl')parts.push((th<=10?onesTTS_idafa[th]:numToArabicTTS(th,true))+' آلَافْ');
+    else if(c==='nasb')parts.push(numToArabicTTS(th)+' أَلْفًا');
+    else parts.push(numToArabicTTS(th)+' أَلْفٍ');
   }
   if(n>=100){
     let h=Math.floor(n/100);
@@ -453,7 +447,11 @@ function numToArabicTTS(n){
     n=n%100;
   }
   if(n>0){
-    if(n<20){parts.push(onesTTS[n]);}
+    if(n<20){
+      /* При idafa и числе 3-10 используем форму без танвина */
+      let form=(idafa&&n>=3&&n<=10&&onesTTS_idafa[n])?onesTTS_idafa[n]:onesTTS[n];
+      parts.push(form);
+    }
     else{
       let t=Math.floor(n/10),o=n%10;
       if(o>0)parts.push(onesTTS[o]+' وَ'+tensTTS[t]);
@@ -463,6 +461,34 @@ function numToArabicTTS(n){
   return parts.join(' وَ');
 }
 
+/* Версия без огласовок — для отображения на экране */
+function numToArabic(n){
+  if(n===0)return'صفر';
+  let parts=[];
+  if(n>=1e12){let t=Math.floor(n/1e12);parts.push(numToArabic(t)+' تريليون');n=n%1e12;}
+  if(n>=1e9){let b=Math.floor(n/1e9);parts.push(numToArabic(b)+' مليار');n=n%1e9;}
+  if(n>=1e6){let m=Math.floor(n/1e6);parts.push(numToArabic(m)+' مليون');n=n%1e6;}
+  if(n>=1000){
+    let th=Math.floor(n/1000);
+    if(th===1)parts.push('ألف');
+    else if(th===2)parts.push('ألفان');
+    else if(th<=10)parts.push(numToArabic(th)+' آلاف');
+    else parts.push(numToArabic(th)+' ألفاً');
+    n=n%1000;
+  }
+  if(n>=100){
+    const h=['','مئة','مئتان','ثلاثمئة','أربعمئة','خمسمئة','ستمئة','سبعمئة','ثمانمئة','تسعمئة'];
+    parts.push(h[Math.floor(n/100)]);n=n%100;
+  }
+  const ones=['','واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة','عشرة','أحد عشر','اثنا عشر','ثلاثة عشر','أربعة عشر','خمسة عشر','ستة عشر','سبعة عشر','ثمانية عشر','تسعة عشر'];
+  const tens=['','','عشرون','ثلاثون','أربعون','خمسون','ستون','سبعون','ثمانون','تسعون'];
+  if(n>0){
+    if(n<20)parts.push(ones[n]);
+    else{let t=Math.floor(n/10),o=n%10;if(o>0)parts.push(ones[o]+' و'+tens[t]);else parts.push(tens[t]);}
+  }
+  return parts.join(' و');
+}
+
 function fmt(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
 
 /* Заменяем конечные огласовки на сукун — диктор читает без гласной */
@@ -470,6 +496,23 @@ function stripFinalVowels(text){
   /* مِئَتَانِ — исключение, сохраняем полностью */
   let p1='__MIATAANI__';
   text = text.replace(/مِئَتَانِ/g, p1);
+  /* Формы тамйиза — сохраняем только те где нужен танвин-фатх (ًا) */
+  const tamyizForms = [
+    'أَلْفًا',
+    'مِلْيُونًا',
+    'مِلْيَارًا',
+    'تْرِيلْيُونًا',
+    'أَلْفَانِ','آلَافْ','أَلْفٍ',
+    'مِلْيُونَانِ','مَلَايِينْ','مِلْيُونٍ',
+    'مِلْيَارَانِ','مِلْيَارَاتْ','مِلْيَارٍ',
+    'تْرِيلْيُونَانِ','تْرِيلْيُونَاتْ','تْرِيلْيُونٍ',
+  ];
+  let tamyizMap = {};
+  tamyizForms.forEach((f,i) => {
+    let key = '__TAMYIZ_'+i+'__';
+    tamyizMap[key] = f;
+    text = text.replace(new RegExp(f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'), key);
+  });
   /* ثَمَانِيَ — исключение, сохраняем фатху (саманиЯ) */
   let p3='__SAMANIYA__';
   text = text.replace(/ثَمَانِيَا/g, p3);
@@ -477,8 +520,6 @@ function stripFinalVowels(text){
   let p2='__ASHARA__';
   text = text.replace(/([َُِ])(\s+عَشَرَ)/g, '__VOWEL_ASHARA__$2');
   text = text.replace(/عَشَرَ/g, p2);
-  /* Танвин-фатх перед алифом: أَلْفًا → أَلْفا */
-  text = text.replace(/ً(?=ا)/g,'');
   /* Та-марбута + танвин → та-марбута + сукун */
   text = text.replace(/ة[ًٌٍ]/g,'ةْ');
   /* Та-марбута на конце слова → сукун */
@@ -492,6 +533,10 @@ function stripFinalVowels(text){
   text = text.replace(new RegExp(p2,'g'), 'عَشَرَ');
   text = text.replace(new RegExp(p3,'g'), 'ثَمَانِيَا');
   text = text.replace(/__VOWEL_ASHARA__/g, 'َ');
+  /* Восстанавливаем формы тамйиза */
+  Object.keys(tamyizMap).forEach(key => {
+    text = text.replace(new RegExp(key,'g'), tamyizMap[key]);
+  });
   return text;
 }
 
@@ -643,9 +688,8 @@ function toggleTheme(){applyTheme(!isDark);}
 const ranges={
   easy:[10,999],medium:[1000,999999],hard:[1000000,999999999],
   expert:[1000000000,999999999999],master:[1000000000000,999999999999999],
-  legend:[1000000000000000,999999999999999999]
 };
-const randomLevels=['easy','medium','hard','expert','master','legend'];
+const randomLevels=['easy','medium','hard','expert','master'];
 
 function updateSpeed(){
   currentSpeed=parseFloat(document.getElementById('speed').value);
@@ -662,6 +706,8 @@ function initSpeedSlider(){
     lbl.title='على الأجهزة المحمولة الحد الأقصى '+maxSpeed+'×';
   }
 }
+
+
 
 function generateNumber(){
   clearTimerInterval();
@@ -687,6 +733,7 @@ function generateNumber(){
   btn.querySelectorAll('.count-el').forEach(el=>el.remove());
 }
 
+
 function revealNumber(){
   let d=document.getElementById('num-display');
   d.classList.remove('hidden');d.classList.add('revealed');
@@ -703,8 +750,8 @@ function speak(){
   let text=stripFinalVowels(numToArabicTTS(currentNumber));
   let utt=new SpeechSynthesisUtterance(text);
   utt.voice=arabicVoice;utt.lang=arabicVoice.lang;utt.rate=currentSpeed;
-  let fallbackMs=Math.ceil((text.length/5)*1000/currentSpeed)+1500;
-  let fallbackTimer=setTimeout(function(){if(timerInterval===null&&!timerWasRunning)startTimer();},fallbackMs);
+  let fallbackMs=Math.ceil((text.length/4)*1000/currentSpeed)+2000;
+  let fallbackTimer=setTimeout(function(){if(!timerWasRunning)startTimer();},fallbackMs);
   utt.onend=function(){clearTimeout(fallbackTimer);if(!timerWasRunning)startTimer();};
   synth.speak(utt);
   document.getElementById('btn-speak').style.display='none';
@@ -875,6 +922,6 @@ setLang(savedLang);
 initSpeedSlider();
 generateNumber();
 checkIOSUnlock();
-</script>
+</script></script>
 </body>
 </html>
